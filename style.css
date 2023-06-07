@@ -1,0 +1,76 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #heading {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  #heading h2 {
+    font-size: 36px;
+    color: #0047ab;
+    margin: 0;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  #keyInfo {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .keyInfoItem {
+    display: inline-block;
+    margin: 20px 35px 20px 35px;
+  }
+  
+  .keyInfoItem i {
+    font-size: 48px;
+    color: #0047ab;
+    margin-right: 20px;
+  }
+  
+  .keyInfoItem h2 {
+    font-size: 28px;
+    margin: 0;
+    color: #333;
+  }
+  
+  #weather {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 600px;
+    width: 100%;
+  }
+  
+  #weather p {
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  
+  .icon {
+    margin-right: 10px;
+  }
+  
+  .icon.windsock-icon {
+    color: #0047ab;
+
+  }
+  
+  .icon.thermometer-icon {
+    color: #ff4d4d;
+  }
+  

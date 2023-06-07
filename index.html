@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Current Weather</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Include the Font Awesome CSS file -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+</head>
+<body>
+  <div id="heading"><h2>Current Weather for Palmerston North, New Zealand</h2></div>
+  <div id="keyInfo"></div>
+  <div id="weather">
+    <p>Loading...</p>
+  </div>
+
+  <script>
+    // Replace 'YOUR_API_KEY' with your actual API key
+    const apiKey = 'ba9308492c7f05e7f852e5f012af7cd2';
+    const city = 'Palmerston North';
+
+    // Function to trigger VMC webhook
+    function triggerVMCWebhook() {
+        const VMCwebhookURL = 'https://maker.ifttt.com/trigger/VFR/with/key/d7h3K0YH1ypVnrqI0W3Xta';
+
+  fetch(VMCwebhookURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Webhook 1 triggered successfully!');
+      } else {
+        throw new Error('Failed to trigger webhook 1');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error.message);
+    });
+}
+
+    // Function to trigger IMC webhook 
+    function triggerIMCWebhook() {
+        const IMCwebhookURL = 'https://maker.ifttt.com/trigger/IMC/with/key/d7h3K0YH1ypVnrqI0W3Xta';
+
+  fetch(IMCwebhookURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Webhook 1 triggered successfully!');
+      } else {
+        throw new Error('Failed to trigger webhook 1');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error.message);
+    });
+
+    console.log('IMC Webhook triggered!');
+}
+      
+    // Fetch weather data from OpenWeather API
+    function checkWeatherConditions() {
+  fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+        const weatherDiv = document.getElementById('weather');
+        const keyInfo = document.getElementById('keyInfo');
+        const temperature = Math.round(data.main.temp - 273.15); // Convert from Kelvin to Celsius
+        const description = data.weather[0].description;
+        const windSpeed = Math.round(data.wind.speed * 1.94384); // Convert m/s to knots
+        const humidity = data.main.humidity;
+        const visibility = data.visibility;
+        const clouds = data.clouds.all;
+        const rainFall = data.rain && data.rain["1h"]; // Check if the rain object and "1h" property exist
+
+        const keyWeatherInfo = `
+        <div id="keyInfo">
+            <div class="keyInfoItem">
+        <i class="icon windsock-icon fa fa-wind"></i>
+        <h2>${windSpeed}kts</h2>
+            </div>
+
+        <div class="keyInfoItem">
+        <i class="icon thermometer-icon fas fa-thermometer-half"></i>
+        <h2>${temperature}°C</h2>
+            </div>
+        </div>
+        `
+        const weatherHTML = `
+          
+          <h3><strong>Observations at:</strong> ${getCurrentTime()}
+          <p><strong>Description:</strong> ${description}</p>
+          <p><strong>Wind Speed:</strong> ${windSpeed} knots</p>
+          <p><strong>Humidity:</strong> ${humidity}%</p>
+          <p><strong>Visibilty:</strong> ${visibility}m</p>
+          <p><strong>Clouds:</strong> ${clouds}</p>
+          ${rainFall ? `<p><strong>Rain in last hour:</strong> ${rainFall}mm</p>` : ''}
+        `;
+
+        weatherDiv.innerHTML = weatherHTML;
+        keyInfo.innerHTML = keyWeatherInfo;
+
+        // Trigger webhooks based on weather conditions
+        if (clouds > 70 && visibility < 7000) {
+          triggerIMCWebhook(); // Call IMC webhook 
+
+        } else if (description.includes('cloudy') || description.includes('rain') || description.includes('showers') || description.includes('broken')) {
+          triggerIMCWebhook(); // Call IMC webhook
+
+        }else if (windSpeed >= 25) {
+          triggerIMCWebhook(); // Call IMC webhook
+
+        } else if (visibility >= 7000 && clouds < 70) {
+          triggerVMCWebhook(); // Call VMC webhook
+
+        } else {
+          console.log('No webhook condition met.');
+        }
+
+        // Log JSON payload to console
+        console.log(data);
+        console.log('Weather conditions checked!');
+      })
+
+      .catch(error => {
+        const weatherDiv = document.getElementById('weather');
+        weatherDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+      });
+    }
+
+    function getCurrentTime() {
+  const now = new Date();
+  const minutes = now.getMinutes();
+  const roundedMinutes = Math.round(minutes / 5) * 5; // Round minutes to the nearest 5
+  const currentTime = now.getHours() + ':' + (roundedMinutes < 10 ? '0' : '') + roundedMinutes;
+  return currentTime;
+}
+
+    checkWeatherConditions();
+
+    setInterval(checkWeatherConditions, 900000);
+
+  </script>
+</body>
+</html>
